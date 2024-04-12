@@ -54,3 +54,21 @@ it can determine what actions to take when updating resources for a particular p
 Terraform can ensure that the entire infrastructure is always in the defined state at all times.
 
 Reource is object that terrafrom can manage. It can be anything a file present in local of any object like ec2,vpc,eks,gke,azure active directory etc.
+
+Types of files:
+--------------
+1. main.tf         --> Main configuration file containing resource defination.
+2. variables.tf    --> Contains variable declaration
+3. output.tf       --> Contains output from resources
+4. provider.tf     --> Contains provider definition
+
+3 Types of providers:
+---------------------
+
+**Official:** Official providers are owned and maintained by HashiCorp	hashicorp
+
+**Partner:** Partner providers are written, maintained, validated and published by third-party companies against their own APIs. 
+To earn a partner provider badge the partner must participate in the HashiCorp Technology Partner Program.	Third-party organization, e.g. mongodb/mongodbatlas
+
+**Community:** Community providers are published to the Terraform Registry by individual maintainers, groups of maintainers, or other members of the Terraform community.	
+Maintainer’s individual or organization account, e.g. DeviaVir/gsuite
