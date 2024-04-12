@@ -33,3 +33,24 @@ Types of IAC Tools
           Deploy Immutable Infrastructure Resoruces - These tools are used to provision infrastructure components using a simple declarative code.
           These infrastructure components can range from servers such virtual machines, databases, VPCs, subnets,security groups, storage, and just about any services based on the provider we choose.
           Supports multiple providers.
+
+Why Terrafrom?
+--------------
+
+TF supports multiple clouds/onpremises using providers. 
+It is written in Hashicorp Configuration Language (HCL) which is declarative in nature.
+
+Declarative means whatever state we wanted we defined it in .tf file and terraform will brings the infrastructure in that state. We dont have to worry about it.
+Terraform does it in 3 phases.
+
+init : In it phase terraform initialises the project and identifies the providers used for the targe environment .
+plan : During the plan phase terrafrom drafts a plan to get to the target stage.
+apply : In apply phase tf makes the changes in target environment to bringe it to the desired stage.
+
+Every object that tf manages is called as resource. A resource can be a compute instance, a database server in the cloud, or in a physical server on-premise that Terraform manages.
+Terraform manages the lifecycle of the resources from its provisioning to configuration to decommissioning.
+Terraform records the state of the infrastructure as it is seen in the real world and based on this,
+it can determine what actions to take when updating resources for a particular platform.
+Terraform can ensure that the entire infrastructure is always in the defined state at all times.
+
+Reource is object that terrafrom can manage. It can be anything a file present in local of any object like ec2,vpc,eks,gke,azure active directory etc.
