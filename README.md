@@ -200,6 +200,30 @@ variable type:
         type = set(number)
   }
 
-- tuple  --> collection of different types of objects (strings,numbers,bool etc)
+- tuple  --> tuple is same like list. In list we can have elements of same types where as in tuple we can have lements of different types(strings,numbers,bool etc)
 
-  
+      varable "kitty" {
+          type = tuple([string,bool,number])
+          default = ["cat",true,7]
+      }
+
+**We can pass the values to the terrafrom at runtime as well:**
+
+    terraform apply -var "filename=/root/pets.txt" -var "content=this is sample one" -var "prefix=Mr."
+
+    or
+
+    export TF_VAR_filename="/root/pets.txt" 
+    export TF_VAR_content="this is sample one"
+    export TF_VAR_prefix="Mr."
+    terraform apply
+
+    or
+
+    terrafrom.tfvars
+    ---------------
+    filename="/root/pets.txt" 
+    content="this is sample one"
+    prefix="Mr."    
+
+    $ terrafrom apply
