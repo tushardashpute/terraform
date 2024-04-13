@@ -227,3 +227,117 @@ variable type:
     prefix="Mr."    
 
     $ terrafrom apply
+
+    or
+
+    if we have variable file as variable.tfvars then we have to pass it manually like
+
+    $ terraform apply -var-file variable.tfvars
+
+    Automatically loaded :
+    
+    - terraform.tfvar | terraform.tfvars.json
+    - *.auto.tfvars   | *.auto.tfvars.json
+    
+variable Definition Precedence 
+------------------------------
+1. Envirnment variables                  --> Low Priority
+2. terrafrom.tfvars
+3. *.auto.tfvars (alaphabetic order)
+4. -var or -var-file (comman-line-flags)  --> High proirity)
+
+Resoruce Attribute
+------------------
+Suppose if we want to use the value of one resource in another resoruce we can use it, we have to follow the syntax:
+
+        ${resource.resrouce_name.attribute}  --> interpolation sequence 
+
+        resource "random_pet" "pets" {
+          prefix = var.prefix
+          seperator = var.seperator
+          length = var.length
+        }
+
+        resoruce "local_file" "my-file"{
+          filename = var.filename
+          contenxt = "My favourite pet is ${random_pet.pets.id}"
+        }
+
+        or
+
+        resource "tls_private_key" "pvtkey" {
+            algorithm = "RSA"
+            rsa_bits = 4096 
+        }
+        
+        resource "local_file" "key_deatils" {
+            filename = "/root/key.txt"
+            content = "${tls_private_key.pvtkey.private_key_pem}"
+        }
+
+Resource Dependency 
+-------------------
+By default terraform will identify resource dependency (implicit dependency) if we use reference expression. If we want to specify dependency we can do it using depends on clause explicitly.
+
+        resource "random_pet" "pets" {
+          prefix = var.prefix
+          seperator = var.seperator
+          length = var.length
+        }
+
+        resoruce "local_file" "my-file"{
+          filename = var.filename
+          contenxt = "My favourite pet is Tom"
+          depends_on = [
+              random_pet.pets
+          ]
+        }
+
+Output variables
+----------------
+This variables used to store value of expression in terrafrom. Syntax use to store this is:
+
+        resource "random_pet" "pets" {
+          prefix = var.prefix
+          seperator = var.seperator
+          length = var.length
+        }
+
+        resoruce "local_file" "my-file"{
+          filename = var.filename
+          contenxt = "My favourite pet is ${random_pet.pets.id}"
+        }
+
+        output pet-name {
+          value = random_pet.pets.id
+          description = "Record the value of pet ID generated bu random_pet resoruce"
+        }
+
+        Syntax:
+
+        output "<variable_name>" {
+          value = "<variable_value>"
+          <arguments>
+        }
+
+Terraform State
+----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
