@@ -119,6 +119,8 @@ To refer variable in main.tf use var.variable name without "".
       
       variable "filename" {
           defaults = "/root/pets.txt"
+          type = string                         //optional
+          description = The path of local file" //optional
       }
       variable "content" {
           defaults = "We love pets!"
@@ -130,3 +132,74 @@ To refer variable in main.tf use var.variable name without "".
         	content = var.content  // To refer variable in main.tf use var.variable name without ""
         	filename = var.filename
       }
+
+variable type:
+-------------
+- string --> "/root/pet.txt" (alphanumeric)
+- number --> 1               (number)
+- bool   --> true/false      (boolean)
+- any    --> default value   (by default)
+- list   --> ["cat","dog"]   [numberd collection start with position 0,1,2..]
+
+      variable "gender" {
+           type = list(string)
+           default = ["Male", "Female"]
+      }
+
+      resource "random_pet" "mypet" {
+            gender = var.genger[0]
+      }
+
+- map    -->  pet1 = cat
+              pet2 = dog
+
+      variable "jedi" {
+           type = map
+           default = {
+               filename = "/root/first-jedi"
+               content = "phanius"
+           }
+      }
+
+      main.tf
+
+      resource "local_file" "pet_name" {
+        	content = var.jedi["content"]
+        	filename = var.jedi["filename"]
+      }
+
+- object --> Complex data structure
+
+      variable "bella" {
+        type = object({
+            name = string
+            age = number
+            color = string
+            food = list(string)
+            favourite_pet = bool
+        })
+    
+        default = {
+              name = "bella"
+              color = "brown"
+              age = 7
+              food = ["fish","meat"]
+              favourite_pet = true
+        }    
+      }
+
+- set    --> list of items without duplicates
+
+    variable "users" {
+         type = set(string)
+         default = ["tom", "jerry", "pluto", "daffy", "donald", "chip", "dale"]  
+    }
+
+    variable "age" {
+        aged = [ 5,7,10 ]
+        type = set(number)
+  }
+
+- tuple  --> collection of different types of objects (strings,numbers,bool etc)
+
+  
