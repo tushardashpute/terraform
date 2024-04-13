@@ -72,3 +72,53 @@ To earn a partner provider badge the partner must participate in the HashiCorp T
 
 **Community:** Community providers are published to the Terraform Registry by individual maintainers, groups of maintainers, or other members of the Terraform community.	
 Maintainer’s individual or organization account, e.g. DeviaVir/gsuite
+
+Multiple Providers:
+-------------------
+ex. main.tf
+
+        resource "local_file" "pet_name" {
+        	    content = "We love pets!"
+        	    filename = "/root/pets.txt"
+        }
+        
+        resource "random_pet" "my-pet" {
+        	      prefix = "Mrs"
+        	      separator = "."
+        	      length = "1"
+        }
+        
+        resource "aws_instance" "ec2_instance" {
+        	  ami       =  "ami-0eda277a0b884c5ab" 
+        	  instance_type = "t2.large"
+        }
+        
+        resource "aws_ebs_volume" "ec2_volume" {
+        	  availability_zone = "eu-west-1"
+        	  size  =    10
+        }
+
+        resource "kubernetes_namespace" "dev" {
+          metadata {
+            name = "development"
+        }
+
+here, random --> provider
+      pet --> resoruce_type
+
+terraform init --> will install two providers plugin local_provider, random_provider and aws_provider
+
+Mrs.hen --> will be created.
+
+variables.tf
+------------
+
+      variables.tf
+      
+      variable "filename" {
+          defaults = "/root/pets.txt"
+      }
+      variable "content" {
+          defaults = "We love pets!"
+      }
+
