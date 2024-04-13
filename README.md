@@ -113,6 +113,8 @@ Mrs.hen --> will be created.
 variables.tf
 ------------
 
+To refer variable in main.tf use var.variable name without "".
+
       variables.tf
       
       variable "filename" {
@@ -122,3 +124,9 @@ variables.tf
           defaults = "We love pets!"
       }
 
+      main.tf
+      
+      resource "local_file" "pet_name" {
+        	content = var.content  // To refer variable in main.tf use var.variable name without ""
+        	filename = var.filename
+      }
