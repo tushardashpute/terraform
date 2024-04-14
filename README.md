@@ -323,15 +323,64 @@ This variables used to store value of expression in terrafrom. Syntax use to sto
 Terraform State
 ----------------
 
+Terrafrom uses state file to map the resources configuration to the real world object. State file is considered as blueprint of all the resoruce that TF manages in real world.
+
+Terrafrom State will be useful :
+- To find resource dependency
+- To maintain the resoruce state
+
+State is a non-optional feature in Terraform.However, there are a few considerations. First one is that, the state file contains sensitive information. Within it, it contains every little detail about our infrastructure.
+When working as a team,it is considered a best practice to store Terraform configuration files in distributed version control systems,such as GitHub,GitLab, or Bitbucket.
+However, owing to the sensitive nature of the state file,it is not recommended to store them in Git repositories.
+Instead, store the state in remote backend systems such as AWS S3, Google Cloud Storage, Azure Storage, Terraform Cloud, etc.
+Terraform state is a JSON data structure that is meant for internal use within Terraform. We should never manually attempt to edit the state files ourselves. 
+However, there would be situations where we may want to make changes to the state file. And in such cases, we should rely on terraform state commands.
 
 
+Terraform Commands
+------------------
+- terrafrom validate --> to check if configuration is valid.
+- terraform fmt or terraform format --> To format configuration in more readable canonical form.
+- terraform show --> show the current of the resource that TF sees. 
+- terraform show -json
+- terraform providers --> to see all providers
+- terraform providers mirror /root/new_path --> this will mirror the provider plugins to new path.
+- terraform output <variable_name>
+- terraform refresh --> To refresh TF state file with realworkld infrastructures. This will not modify any infrastructure but it will modify the state file. This is also run auto by terraform plan and apply.
+- terraform graph
+
+Lifecycle Rules
+-------------------------------------
+By default Terraform will first deleted old resoruce and then create new resource.
+- create_before_destroy : This will create new resoruce first and then delete the older one.
+- prevent_destroy : This will prevent the resoruce from deleted. The resrouce will be still deleted if we run terrafrom destroy command. This will only prevent if it will be deleted in subsequent apply.
+- ignore_changes : This rule when applied will prevent a resoruce from being updated based on a list of attributes that we define within lifecycle block.
 
 
+      ex.1
+      resoruce "local_file" "sample" {
+        filename = "/root/sample.txt"
+        content  = "This is the sample file"
+        file_permission = "0700"
+      
+        lifecycle {
+          create_before_destroy = true
+        }
+      }
 
-
-
-
-
+      ex.2 
+      resoruce "aws_instance" "webserver" {
+        ami           = "ami-12345"
+        instance_type = "t2.lasrge"
+        tags = {
+            name = "my-webserver"
+        }
+      lifecycle {
+          ignore_chanes = [
+              tags,ami
+          ]
+      }
+      }
 
 
 
