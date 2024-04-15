@@ -382,11 +382,73 @@ By default Terraform will first deleted old resoruce and then create new resourc
       }
       }
 
+Datasources:
+------------
+Data sources allow Terraform to read attributes from resources which are provisioned outside its control. Datasoruce only reads infrastructure.
+The data block is quite similar to the resource block. Instead of the keyword called resource, we define a data source block with the keyword called "data."
+This is followed by the type of resource which we are trying to read.
+
+suppose we have a local file created with shell as dogs.txt.The data read from a data source is then available under the "data object" in Terraform.
+So, To use this data in the resource called "Pet", we could simply use data.local_file.dog.content.
 
 
+      cat /root/dogs.txt
+      Dogs are awesome.
+      
+      resoruce "local_file" "pet" {
+        filename = "/root/pets.txt"
+        content  = data.local_file.dog.content
+      }
+      
+      data "local_file" "dog" {
+        filename = "/root/dogs.txt"
+      }
 
+Meta Arguments
+--------------
+Meta arguments can be used within any resoruce block. We have already seen two of them
+- depends_on 
+- lifecycle
+- count : One of easiest way to create multiple instances of resoruce is to use count meta-argument. When we use count resources are created as list.
 
+      ex.
+      
+      variables.tf
+      
+      variable "filename" {
+        default = [
+          "/root/dogs.txt",
+          "/root/cats.txt",
+          "/root/cows.txt",
+          "/root/pigs.txt"
+        ]
+      }
+      
+      resoruce "local_file" "pets" {
+        filename = var.filename[count.index]
+      
+        count = length(var.filename)
+      }
 
+- for_each : for_each will work only with map or sets.
 
-
+      ex.
+      
+      variables.tf
+      ---
+      variable "filename" {
+      type=list(string)
+        default = [
+          "/root/dogs.txt",
+          "/root/cats.txt",
+          "/root/cows.txt",
+          "/root/pigs.txt"
+        ]
+      }
+      
+      resoruce "local_file" "pets" {
+        filename = each.value
+      
+        for_arch = toset(var.filename)
+      }
 
