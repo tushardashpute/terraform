@@ -449,6 +449,72 @@ Meta arguments can be used within any resoruce block. We have already seen two o
       resoruce "local_file" "pets" {
         filename = each.value
       
-        for_arch = toset(var.filename)
+        for_each = toset(var.filename)
       }
 
+AWS
+---------
+aws --endpoint http://aws:4566 iam create-user --user-name  mary
+
+aws --endpoint http://aws:4566 iam attach-user-policy --policy-arn "arn:aws:iam::aws:policy/AdministratorAccess" --user-name  mary
+
+aws iam --endpoint http://aws:4566 create-group --group-name project-sapphire-developers
+
+aws iam --endpoint http://aws:4566 add-user-to-group --group-name project-sapphire-developerss --user-name jack
+
+aws iam --endpoint http://aws:4566 list-attached-user-policies --user-name jack
+
+aws iam --endpoint http://aws:4566 list-attached-group-policies --group-name project-sapphire-developers
+
+aws iam --endpoint http://aws:4566 attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess --group-name project-sapphire-developers
+
+
+Attaching AWS policy doc:
+--------------------------
+      admin-policy.json
+      {
+          "version" : "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "*",
+              "Resoruce": "*"
+            }
+          ] 
+      }
+      
+      main.tf
+      resoruce "aws_iam_user" "admin-user" {
+        name = "lucy"
+        tags = {
+          Description = "Technical Team Leader"
+        }
+      }
+      
+      resrouce "aws_iam_policy" "adminuser" {
+        Name = "AdminUsers"
+        policy = file("admin-policy.json")
+      }
+      
+      or
+      
+      resrouce "aws_iam_policy" "adminuser" {
+        Name = "AdminUsers"
+        policy = >>EOF
+        {
+          "version" : "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "*",
+              "Resoruce": "*"
+            }
+          ] 
+        }
+        EOF
+      }
+      
+      resource "aws_iam_user_policy_attachement" "lucy-admin-access" {
+        user = aws_iam_user.admin-user.name
+        policy_arn = aws_iam_user_policy_attachment.adminuser.arn
+      }
