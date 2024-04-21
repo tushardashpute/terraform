@@ -518,3 +518,117 @@ Attaching AWS policy doc:
         user = aws_iam_user.admin-user.name
         policy_arn = aws_iam_user_policy_attachment.adminuser.arn
       }
+
+Terrafrom State File
+--------------------
+    terraform {
+      backend "s3" {
+        key = "terraform.tfstate"
+        region = "us-east-1"
+        bucket = "remote-state"
+      }
+    }
+
+terrafrom state <list|show|mv|pull|rm>
+
+terrafrom state <subcommand> [options] [args]
+
+ex. terrafrom state show aws_s3_bucket.finance
+
+1. terrafrom state list [options] [address]
+
+This will list all the resources recorded in the statefile. It will only print the resoruce address.
+
+2. terrafrom state show  [options] [address]
+
+This will show all the attributes of the reource.
+
+ex. terrafrom state show aws_s3_bucket.finance
+
+3. terrafrom state mv [options] source destination
+
+This command is use to move items in different state file. The items can be moved in a same state file means moving resource from its current source address to another, means renaming resource.
+Or it can move itsms from one state file to another.
+
+ex. terrafrom state move aws_dynamodb_table.orig aws_dynamodb_table.original
+
+4. terrafrom state pull
+
+To pull the state file from remote.
+
+5. terrafrom state rm
+
+This is used to remove resoruce from state file.
+
+Terrafrom Provisioner:
+---------------------
+To execute file on remote resource.
+
+
+    provisioner "remote-exec" {
+      inline = [ "sudo apt update",
+                 "sudo apt install nginx -y"
+              ]
+    }
+
+Local-exec use to run the command from where you are running the terrafrom apply command.
+
+    provisioner "local-exec" {
+      on_failure = fail|continue
+      command = "echo ${aws_instance.webserver.public_ip} >> /tmp/ips.txt"
+    }
+
+By default provisioners are run after resources are created.
+
+Destroy-time provisioner:
+
+    provisioner "local-exec" {
+      when = destroy
+      command = "echo ${aws_instance.webserver.public_ip} >> /tmp/ips.txt"
+    }
+
+Ex.
+
+      main.tf
+      variable "ami" {
+        default = "ami-06178cf087598769c"
+      }
+      
+      variable "instance_type" {
+        default = "m5.large"
+      }
+      
+      variable "region" {
+        default = "eu-west-2"
+      }
+      
+      resource "aws_instance" "cerberus" {
+        ami           = var.ami
+        instance_type = var.instance_type
+        key_name = "cerberus"
+
+        user_data = file("install-nginx.sh")
+      }
+
+      resource "aws_key_pair" "cerberus-key" {
+        key_name = "cerberus"
+        public_key = file(".ssh/cerberus.pub")
+      }
+    
+      resource "aws_eip" "eip" {
+        vpc = true
+        instance = aws_instance.cerberus.id
+        provisioner "local-exec" {
+          command = "echo ${aws_eip.eip.public_dns} >> /root/cerberus_public_dns.txt"
+        }
+    }
+      
+      provider.tf
+      terraform {
+        required_providers {
+          aws = {
+            source = "hashicorp/aws"
+            version = "4.15.0"
+          }
+        }
+      }
