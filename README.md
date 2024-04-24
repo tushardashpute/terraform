@@ -632,3 +632,140 @@ Ex.
           }
         }
       }
+
+Terraform taint and untaint 
+---------------------------
+
+terraform untaint resrouce_name
+
+Terrafrom logging
+-----------------
+
+Terrafrom provides 5 levels of logging. 
+
+export TF_LOG=TRACE
+export TF_LOG_PATH=/tmp/terraform.log
+
+- INFO
+- WARNING
+- ERROR
+- DEBUG
+- TRACE
+
+Terraform IMPORT
+----------------
+    To import existing infrastructrure resoruce in Terraform.
+    
+    Syntax: terrafrom import <resrouce_type>.<resoruce_name> <attribute>
+    
+    ex. terrafrom import aws_instance.webserver-2 i-026abcd9885
+    
+    Error: resource address "aws_instance.webserver-2" does not exists.
+    
+    Before importing this resource, please create its configuration in the root module.
+    ex. 
+    resoruce "aws_instance" "webserver-2" {
+    # {resoruce_args}
+    }
+
+    Once this is done, the resoruce info will be added to the state file, but you need to manually then add it to the resoruce_block.
+    After this run terrafrom plan, tf will understand resoruce is already there and will carry no action. Resrouce is not under the control of terrafrom.
+
+Terrafrom Modules:
+------------------
+- Complex Configuration Files
+- Duplicate Code
+- Increased Risk
+- Limits Reusabolity
+
+Any configuration directry containing set of configuration files is called module.
+
+to use module :
+
+    mkdir -p terraform-projects/modules/payroll-app
+    # app_server.tf
+    ---
+    resrouce "aws_instance" "app_server" {
+      ami = var.ami
+      instance_type = "t2.medium"
+      tags = {
+        Name = "${var.app_region}-app-server"
+      }
+      depends_on = [ aws_dynamodb_table.payroll_db,
+                     aws_s3_bucket.payroll_data
+                   ]
+    }
+    # dynamodb_table.tf
+    ---
+    resoruce "aws_dynamodb_table" "payroll_db" {
+      name = "user_data"
+      billing_mode = "PAY_PER_REQUEST"
+      hash_key = "Emp_ID"
+    
+      attribute {
+        name = "Emp_ID"
+        type = "N"
+      }
+    }
+    # s3_bucket.tf
+    ---
+    resoruce "aws_s3_bucket" "payroll_data" {
+      bucket = "${var.app_region}-${var.bucket}"
+    }
+    # variables.tf
+    ---
+    variable "app_resion" {
+      type = string
+    }
+    
+    variable "ami" {
+      type = string
+    }
+    
+    variable "bucket" {
+      default = "flexit-payroll-alpha-2024c"
+    }
+    
+mkdir -p terraform-projects/modules/payroll-us
+    # main.tf
+    ---
+    module "us_payroll" {
+      source = "../modules/payroll-app"
+      app_region = "us-east-1"
+      ami = "ami-123456"
+    }
+    # provider.tf
+    ---
+    provider "aws" {
+      region = "us-east-1"
+    }
+
+mkdir -p terraform-projects/modules/payroll-uk
+    # main.tf
+    ---
+    module "uk_payroll" {
+      source = "../modules/payroll-app"
+      app_region = "us-west-2"
+      ami = "ami-12345689"
+    }
+    # provider.tf
+    ---
+    provider "aws" {
+      region = "us-west-2"
+    }
+
+Using modules from terrafrom registery
+--------------------------------------
+verified module  --> bluetick mark and validated by hashicorp
+community module
+
+module "security_group_ssh" {
+  source "terrafrom-aws-modules/security-groups/aws/modules/ssh"
+  version = "3.16.0'
+  # insert the 2 required variables here
+  vpc_id = "vpc_sdad"
+  ingress_cidr_blocks = [ "10.10.0.0/16" ]
+  name = "ssh-access"
+}
+
+
